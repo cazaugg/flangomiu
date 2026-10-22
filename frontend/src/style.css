@@ -1,0 +1,93 @@
+@import 'tailwindcss';
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Fraunces', ui-serif, Georgia, serif;
+
+  --color-flamingo-50: #fff3f0;
+  --color-flamingo-100: #ffe1da;
+  --color-flamingo-200: #ffc9bc;
+  --color-flamingo-300: #fba893;
+  --color-flamingo-400: #f5836e;
+  --color-flamingo-500: #ee6c5a;
+  --color-flamingo-600: #e05142;
+  --color-flamingo-700: #c13f33;
+
+  --color-clay-700: #8c3b2e;
+  --color-brick-600: #a8432f;
+
+  --color-sand-50: #fbf7f3;
+  --color-sand-100: #f6efe9;
+  --color-sand-200: #ede2d8;
+  --color-sand-300: #e0d0c2;
+
+  --color-stone-400: #8d7a72;
+  --color-stone-500: #6e5c54;
+  --color-stone-700: #4a3b35;
+  --color-stone-900: #2e231f;
+}
+
+@layer base {
+  body {
+    min-height: 100dvh;
+    color: var(--color-stone-900);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    background-color: var(--color-flamingo-50);
+    background-image:
+      radial-gradient(1100px 560px at 8% -12%, var(--color-flamingo-100), transparent 62%),
+      radial-gradient(900px 520px at 108% -6%, #fbe9d8, transparent 58%);
+    background-attachment: fixed;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer utilities {
+  .surface-card {
+    background-color: color-mix(in srgb, white 82%, transparent);
+    border: 1px solid var(--color-sand-200);
+    backdrop-filter: blur(10px);
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.markdown-body {
+  --tw-prose-body: var(--color-stone-700);
+  --tw-prose-headings: var(--color-clay-700);
+  --tw-prose-lead: var(--color-stone-500);
+  --tw-prose-links: var(--color-flamingo-600);
+  --tw-prose-bold: var(--color-stone-900);
+  --tw-prose-counters: var(--color-flamingo-500);
+  --tw-prose-bullets: var(--color-flamingo-400);
+  --tw-prose-hr: var(--color-sand-200);
+  --tw-prose-quotes: var(--color-stone-500);
+  --tw-prose-quote-borders: var(--color-flamingo-300);
+  --tw-prose-code: var(--color-brick-600);
+  --tw-prose-pre-bg: var(--color-stone-900);
+  --tw-prose-pre-code: var(--color-sand-100);
+  --tw-prose-th-borders: var(--color-sand-300);
+  --tw-prose-td-borders: var(--color-sand-200);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.18s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}

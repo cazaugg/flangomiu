@@ -1,0 +1,14 @@
+{
+  "name": "flagomiu",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Familientagebuch und Planung (Monorepo-Wrapper)",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "typecheck": "npm --prefix frontend run typecheck",
+    "preview": "npm --prefix frontend run preview",
+    "backend": "backend/.venv/bin/python backend/run.py",
+    "seed": "backend/.venv/bin/python backend/seed_db.py"
+  }
+}
