@@ -74,29 +74,37 @@ npm run dev        # Vite-Dev-Server auf http://localhost:5173
 npm run seed       # Datenbank zurücksetzen und Demo-Daten anlegen
 npm run build      # Produktions-Build des Frontends
 npm run typecheck  # TypeScript prüfen
+npm run test       # Backend-Tests (uv run pytest)
 ```
+
+Voraussetzung für die Backend-Befehle: [uv](https://docs.astral.sh/uv/) ist
+installiert (`pacman -S uv`); die virtuelle Umgebung wird automatisch verwaltet.
 
 Backend und Frontend laufen als zwei Prozesse — also `npm run backend` in einem
 Terminal und `npm run dev` in einem zweiten starten.
 
 ### Backend (Flask + SQLite)
 
+Abhängigkeiten und virtuelle Umgebung werden mit [uv](https://docs.astral.sh/uv/)
+verwaltet (`backend/pyproject.toml` + `backend/uv.lock`):
+
 ```bash
 cd backend
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/python seed_db.py     # Demo-Daten und Benutzer anlegen
-.venv/bin/python run.py         # http://localhost:5000
+uv sync                         # .venv anlegen/aktualisieren (inkl. Dev-Abhängigkeiten)
+uv run python seed_db.py        # Demo-Daten und Benutzer anlegen
+uv run python run.py            # http://localhost:5000
 ```
 
 Demo-Benutzer: `admin` / `flamingo` (Schreibzugriff) und `gast` / `flamingo` (nur Lesen).
+
+Nach Änderungen an den Abhängigkeiten `uv add <paket>` bzw. `uv add --dev <paket>`
+verwenden (statt `pip install`); `uv sync` aktualisiert danach die Umgebung.
 
 Tests:
 
 ```bash
 cd backend
-.venv/bin/pip install -r requirements-dev.txt
-.venv/bin/python -m pytest
+uv run pytest
 ```
 
 ### Frontend (Vue 3 + Vite + Tailwind)
