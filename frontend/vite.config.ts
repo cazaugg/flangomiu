@@ -12,6 +12,10 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
+      workbox: {
+        // Never answer API requests with the cached app shell.
+        navigateFallbackDenylist: [/^\/api\//],
+      },
       manifest: {
         name: 'Flagomiu — Familientagebuch',
         short_name: 'Flagomiu',

@@ -1,0 +1,34 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: flagomiu:latest
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: production
+      SECRET_KEY: ${SECRET_KEY:-}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-true}
+      DATA_DIR: /data/flagomiu
+      TZ: ${TZ:-Europe/Zurich}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      GUEST_USERNAME: ${GUEST_USERNAME:-}
+      GUEST_PASSWORD: ${GUEST_PASSWORD:-}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-32}
+    volumes:
+      # Host path holding the SQLite database and all uploaded pictures.
+      # Must be writable by uid/gid 10001: sudo chown -R 10001:10001 /data/flagomiu
+      - /data/flagomiu:/data/flagomiu
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=4)
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s

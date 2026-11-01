@@ -120,6 +120,73 @@ also einmalig `npm install --prefix frontend`).
 
 Weitere Skripte: `npm run build`, `npm run typecheck`, `npm run preview`.
 
+## Deployment (Coolify)
+
+Die App läuft als **ein** Container: Gunicorn liefert die Flask-API unter `/api`
+und das gebaute Vue-Frontend (inkl. PWA) aus. Alle veränderlichen Daten liegen
+in `/data/flagomiu` (SQLite-Datenbank und Uploads), das ist der einzige Pfad, der
+gesichert werden muss.
+
+### Voraussetzungen auf dem Host
+
+Der Container läuft als UID/GID `10001`. Bei einem Bind-Mount müssen die
+Rechte vor dem ersten Deploy gesetzt werden:
+
+```bash
+sudo mkdir -p /data/flagomiu
+sudo chown -R 10001:10001 /data/flagomiu
+```
+
+### Coolify
+
+1. Neues Projekt → Resource aus dem Git-Repository.
+2. Build Pack **Dockerfile**, Base Directory `/`, Dockerfile `/Dockerfile`.
+3. Port `8000`, Domain mit HTTPS (Let's Encrypt) verbinden.
+4. Healthcheck-Pfad: `/api/health`.
+5. Persistent Storage als **Bind Mount**: `/data/flagomiu` → `/data/flagomiu`.
+6. Umgebungsvariablen setzen (siehe `.env.example`):
+   - `SECRET_KEY` — Pflicht, z. B. `python -c 'import secrets; print(secrets.token_hex(32))'`
+   - `ADMIN_USERNAME` / `ADMIN_PASSWORD` — legt beim ersten Start den
+     Schreib-Account an (idempotent, überschreibt nichts)
+   - optional `GUEST_USERNAME` / `GUEST_PASSWORD` für einen Lese-Account
+   - `SESSION_COOKIE_SECURE=true` (Standard, wenn `APP_ENV=production`)
+   - `TZ=Europe/Zurich` (wichtig: die App rechnet mit lokaler Zeit)
+   - optional `MAX_UPLOAD_MB` (Standard 32)
+7. Deployen. Beim ersten Start werden Tabellen und Admin-Account automatisch
+   angelegt; Demo-Daten werden **nicht** eingespielt.
+
+Alternativ kann `docker-compose.yml` direkt als Coolify-Compose-Ressource
+verwendet werden; sie enthält denselben Bind-Mount.
+
+### Lokal testen
+
+```bash
+docker compose up --build
+# http://localhost:8000
+```
+
+`SECRET_KEY` und `ADMIN_PASSWORD` vorher in `.env` setzen (siehe `.env.example`).
+
+### Backup
+
+Zu sichern ist ausschließlich `/data/flagomiu`:
+
+```bash
+# Konsistenter SQLite-Snapshot (funktioniert auch mit WAL)
+sqlite3 /data/flagomiu/flagomiu.db \
+  ".backup '/backup/flagomiu-$(date +%F).db'"
+# Bilder
+rsync -a /data/flagomiu/uploads/ /backup/uploads/
+```
+
+Coolifys eingebaute Datenbank-Backups greifen bei SQLite nicht — dafür einen
+Host-Cronjob oder einen Coolify Scheduled Task verwenden und das Backup
+zusätzlich extern (z. B. restic) sichern.
+
+> **Achtung:** `npm run seed` bzw. `uv run python seed_db.py` löscht alle
+> Tabellen. Nur lokal für Demo-Daten verwenden, niemals auf der
+> Produktions-Instanz.
+
 ## Projektstruktur
 
 ```
